@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 const logo = require("../../assets/images/logo.png")
 
-// const PC_IP = "192.168.60.220";
+// const PC_IP = "192.168.60.218";
 
 // const API_BASE = Platform.select({
 //   web: `http://127.0.0.1:3000`,     
@@ -24,8 +24,7 @@ function getNativeApiBase() {
   return `http://${host}:3000`;
 }
 
-const API_BASE =
-  Platform.OS === "web" ? "http://127.0.0.1:3000" : getNativeApiBase();
+const API_BASE = getNativeApiBase();
 
 
 const LINES = ['Aライン', 'Bライン', 'Cライン', 'Dライン', 'Eライン', 'Fライン'];
@@ -300,21 +299,22 @@ export default function StaffScreen()
   const isIpad = width >= 768
   const router = useRouter()
   const {logout} = useAuth()
-
-  const onPrepOK = async () => 
-  {
-    if (!canPrep) 
-    {
-      alert(paused ? '中断中：先に「生産 再開」を押してください' : 'このタスクは終了しました');
-      return;
-    }
-    try 
-    {
-      await manual(10);            
-      flash('準備OK');              
-      await loadCurrent().catch(() => {});
-    } catch {}
-  };
+  const goBack = () => {
+  if (router.canGoBack()) {
+    router.replace('/auth/login');
+  }
+};
+  const onPrepOK = async (amount: number) => {
+  if (!canPrep) {
+    alert(paused ? '中断中：先に「生産 再開」を押してください' : 'このタスクは終了しました');
+    return;
+  }
+  try {
+    await manual(amount); 
+    flash(`${amount}セット準備OK`); 
+    await loadCurrent().catch(() => {});
+  } catch {}
+};
 
 
   useEffect(() => {
@@ -340,7 +340,7 @@ export default function StaffScreen()
           </View>
 
           <Pressable onPress={logout} hitSlop={12} style={({pressed}) => [styles.logoutBtn, pressed && {opacity: 0.85}]}>
-            <Text style={styles.logoutText}>ログアウト</Text>
+            <Text style={styles.logoutText}>戻る</Text>
           </Pressable>
         </View>
 
@@ -429,7 +429,18 @@ export default function StaffScreen()
               </View>
 
               <View style={styles.banner}>
-                <ActionButton label="10セット準備OK" color="red" disabled={!canPrep || sending} onPress={onPrepOK} />
+                <ActionButton 
+                  label="10セット準備OK" 
+                  color="red" 
+                  disabled={!canPrep || sending} 
+                  onPress={() => onPrepOK(10)} 
+                />
+                <ActionButton 
+                  label="25セット準備OK" 
+                  color="red" 
+                  disabled={!canPrep || sending} 
+                  onPress={() => onPrepOK(25)} 
+                />
                 <View style={styles.bannerMessage}>
                   <Text style={styles.bannerMsgText}>{bannerMessage || " "}</Text>
                 </View>

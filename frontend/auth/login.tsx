@@ -7,7 +7,7 @@ const GREEN = '#157f3d';
 
 export default function Login() {
   const router = useRouter();
-  const { signInAsStaff } = useAuth(); 
+  const { signInAsStaff } = useAuth();
 
   const goAdmin = () => router.push('/auth/admin_login');
 
@@ -16,6 +16,8 @@ export default function Login() {
   };
 
   const startPackage = () => router.push('../package');
+
+  const goMasterInput = () => router.push('/auth/master_input');
 
   return (
     <View style={styles.screen}>
@@ -43,6 +45,13 @@ export default function Login() {
             <Text style={styles.primaryTxt}>梱包</Text>
           </Pressable>
         </View>
+
+        {/* Nút マスター入力 nằm ở góc dưới bên phải */}
+        <View style={styles.bottomRow}>
+          <Pressable onPress={goMasterInput} style={[styles.primaryBtn, styles.masterBtn]}>
+            <Text style={[styles.primaryTxt, styles.masterTxt]}>マスター入力</Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -56,7 +65,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   title: {
-    textAlign: 'center', 
+    textAlign: 'center',
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 12,
@@ -79,7 +88,7 @@ const styles = StyleSheet.create({
   },
   logo: { fontSize: 60, width: 250, height: 90 },
   factory: {
-    fontSize: 50, 
+    fontSize: 50,
     fontWeight: '600',
   },
   primaryBtn: {
@@ -91,7 +100,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primaryTxt: {
-    color: '#fff', 
+    color: '#fff',
     fontSize: 60,
     fontWeight: '600',
   },
@@ -104,4 +113,17 @@ const styles = StyleSheet.create({
   },
   lineTitle: { fontSize: 50, fontWeight: '700', marginBottom: 4 },
   wideBtn: { minWidth: 180 },
+
+  // --- thêm mới ---
+  bottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  masterBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+  },
+  masterTxt: {
+    fontSize: 36,
+  },
 });

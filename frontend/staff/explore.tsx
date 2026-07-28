@@ -1,16 +1,7 @@
 import Constants from 'expo-constants';
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
-
-// const PC_IP = "192.168.60.220";
-
-// const API_BASE = Platform.select({
-//   web: "http://127.0.0.1:3000",     
-//   ios: `http://${PC_IP}:3000`,      
-//   android: `http://${PC_IP}:3000`,   
-//   default: `http://${PC_IP}:3000`,
-// });
 
 function getNativeApiBase() {
   const anyConst: any = Constants;
@@ -20,9 +11,7 @@ function getNativeApiBase() {
   return `http://${host}:3000`;
 }
 
-const API_BASE =
-  Platform.OS === "web" ? "http://127.0.0.1:3000" : getNativeApiBase();
-
+const API_BASE = Platform.OS === "web" ? "http://127.0.0.1:3000" : getNativeApiBase();
 
 const DEFAULT_LINE = "Aライン"
 
@@ -39,7 +28,6 @@ type Row = {
 
 function ftime(s?: string | null) {
   if (!s) return "";
-  // Backend đã trả sẵn "HH:mm" → trả nguyên
   if (/^\d{2}:\d{2}$/.test(s)) return s;
   return String(s);
 }
@@ -71,20 +59,12 @@ export default function CounterHistory() {
     } catch(e: any) { setErr(String(e.message || e)) }
   }, [line_name, product_name]);
 
-  useFocusEffect(useCallback(() => { load(); },[load]));
-
-  // useEffect(() => {
-  //   const run = async () => {
-  //     try {
-  //       const r = await fetch(`${API_BASE}/staff/lines/${encodeURIComponent(LINE_NAME)}/counter-history?limit=100`)
-  //       if (!r.ok) throw new Error(`HTTP ${r.status}`)
-  //       setRows(await r.json())
-  //     } catch (e: any) {
-  //       setErr(String(e.message || e))
-  //     }
-  //   }
-  //   run()
-  // }, [])
+  // Tự động load dữ liệu khi vào trang và lặp lại định kỳ (ví dụ mỗi 3 giây) thay cho socket
+  useEffect(() => {
+    load();
+    const timer = setInterval(load, 3000);
+    return () => clearInterval(timer);
+  }, [load]);
 
   if (err) return <View style={S.root}><Text style={S.title}>エラー: {err}</Text></View>
   if (!rows) return <View style={S.root}><ActivityIndicator /></View>
